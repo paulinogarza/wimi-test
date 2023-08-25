@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import {
-  createUserDocumentFromAuth,
   signInWithGooglePopup,
-  signInUserWithEmailAndPassword
+  signInAuthUserWithEmailAndPassword
 }
   from '../../utils/firebase/firebase.utils';
 
 
 import FormInput from '../form-input/form-input.component';
 import './sign-in-form.styles.scss';
-import Button from '../button/button.component';
+import Button, { BUTTON_TYPE_CLASSES } from '../button/button.component';
 
 const defaultFormFields = {
   email: '',
@@ -19,8 +18,6 @@ const defaultFormFields = {
 const SignInForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
-
-  console.log(formFields);
 
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
@@ -34,8 +31,7 @@ const SignInForm = () => {
       return alert('Email and password must be filled out');
 
     try {
-      const response = await signInUserWithEmailAndPassword(email, password);
-      console.log('user logged in response', response);
+      const { user } = await signInAuthUserWithEmailAndPassword(email, password);
       resetFormFields();
     } catch (error) {
       console.log('user log in error: ', error);
@@ -57,8 +53,7 @@ const SignInForm = () => {
   }
 
   const signInWithGoogle = async () => {
-    const { user } = await signInWithGooglePopup();
-    await createUserDocumentFromAuth(user);
+    await signInWithGooglePopup();
   }
 
   return (
@@ -71,7 +66,7 @@ const SignInForm = () => {
         <FormInput label='Password' type='password' required name='password' value={password} onChange={handleChange} />
         <div className='buttons-container'>
           <Button type='submit' >Sign In</Button>
-          <Button type='button' buttonType='google' onClick={signInWithGoogle} type='submit' >Google Sign In</Button>
+          <Button type='button' buttonType={BUTTON_TYPE_CLASSES.google} onClick={signInWithGoogle} >Google Sign In</Button>
         </div>
       </form>
     </div>
